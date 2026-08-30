@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+
+    <style>
+        <style>
+        body {
+            background-color: #D8DBE2;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .form {
+            background: #A9BCD0;
+            width: 450px;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .field-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: inline-block;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #1B263B;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #0D1B2A;
+        }
+
+        #summary {
+            margin-top: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        #summary div {
+            margin-bottom: 6px;
+        }
+
+        .grandTotal {
+            font-weight: bold;
+            font-size: 1.1em;
+            border-top: 1px solid #ccc;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+      
+    <div class="container">
+        <div class="form">
+            <label for="activity">Activity:</label>
+            <select onchange="activity()" name="activity" id="activity">
+                <option value="2">Exercise Bike: $15/day</option>
+                <option value="1">Treadmill: $25/day</option>
+                <option value="3">Dumbbell Set: $10/day</option>
+            </select>
+            <br>
+            <label for="days">Number of days:</label>
+            <input type="number" name="days" id="days" min="0" value="0"/>
+            <br>
+            <label for="home-delivery">Home Delivery:</label>
+            <input type="checkbox" name="home-delivery" id="home-delivery"/>
+            <br>
+            <button onclick="calculate()">Calculate</button>
+
+    
+            <div id="summary">
+
+            </div>
+
+        </div>
+        
+    </div>
+
+    <script>
+        const activities = [
+            {
+                name : "Treadmill",
+                id  : 1,
+                price : 25
+            },
+            {
+                name : "Exercise Bike",
+                id  : 2,
+                price : 15
+            },
+            {
+                name : "Dumbbell Set",
+                id  : 3,
+                price : 10
+            },
+        ]
+
+        function activity(){
+            var exerciseSelected = document.querySelector("#activity").value;
+           // alert(exerciseSelected);
+        }
+        function calculate(){
+            if(document.querySelector("#days").value <= 0){
+                alert("No days have been selected");
+                return;
+            }
+
+
+            var rawSubTotal = 0;
+            var activityId = document.querySelector("#activity").value;
+            var priceActivity = 0;
+            activities.forEach(activity => {
+                if (activityId == activity.id){
+                    priceActivity = activity.price;
+                }
+               
+            });
+            var daysSelected = document.querySelector("#days").value;
+
+            rawSubTotal = priceActivity * daysSelected;
+            console.log(rawSubTotal);
+            
+            var discount = 0;
+            if(daysSelected >= 7){
+                discount = (10 * rawSubTotal) / 100;
+
+            }
+       
+            rawSubTotal -=discount;
+
+            //Delivery Fee
+            var homeDelivery = document.querySelector('#home-delivery').checked;
+
+
+            var grandTotal = rawSubTotal;
+            if(homeDelivery){
+                grandTotal += 30;
+            }
+
+            var tax = (7 * grandTotal) / 100;
+  
+
+            grandTotal +=tax; 
+
+            console.log(grandTotal);
+            //Summary creation
+
+            document.querySelector('#summary').innerHTML = "";
+            const subTotalDiv = document.createElement("div");
+            subTotalDiv.classList.add('subtotal');
+            subTotalDiv.innerText = "Subtotal: $" + priceActivity  + " x $" +  daysSelected + " = $" + priceActivity * daysSelected;
+            document.querySelector('#summary').appendChild(subTotalDiv);
+            if(daysSelected >= 7){
+                const discountDiv = document.createElement("div");
+                discountDiv.classList.add('discount');
+                discountDiv.innerText = "10% Discount (7+ days): $" + discount;
+                document.querySelector('#summary').appendChild(discountDiv);
+
+                const adjustedDiscount= document.createElement("div");
+                adjustedDiscount.classList.add('adjustedDiscount');
+                adjustedDiscount.innerText = "Adjusted Subtotal: $" + ((priceActivity * daysSelected) - discount);
+                document.querySelector('#summary').appendChild(adjustedDiscount);
+              }
+
+            if(homeDelivery){
+                const deliveryFeeDiv = document.createElement("div");
+                deliveryFeeDiv.classList.add('delivery');
+                deliveryFeeDiv.innerText = "Delivery Fee: +$30$";
+                document.querySelector('#summary').appendChild(deliveryFeeDiv);
+            }
+
+            homeDelivery
+
+            const taxDiv = document.createElement("div");
+            taxDiv.classList.add('tax');
+            taxDiv.innerText = "Tax (7% on $" + (rawSubTotal + 30) + "): +$" + ((rawSubTotal + 30) * 7 / 100);
+            document.querySelector('#summary').appendChild(taxDiv);
+
+            const granTotalDiv = document.createElement("div");
+            granTotalDiv.classList.add('grandTotal');
+            granTotalDiv.innerText = "Grand Total: $" + grandTotal;
+            document.querySelector('#summary').appendChild(granTotalDiv);
+
+
+            
+            
+
+              //Delivery Fee: $+\$30$
+            
+                //Adjusted Subtotal: $\$135$
+
+            //
+
+            //console.log(document.querySelector("#activity").value);
+        }
+    </script>
+    
+  
+</body>
+</html>
